@@ -1,0 +1,7 @@
+proc strlen in
+    "" drop // placeholder until we add while loops
+end
+
+proc input in
+    print __input__
+end

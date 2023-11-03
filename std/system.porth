@@ -1,0 +1,23 @@
+proc system in
+    __input__ __system__
+end
+
+proc flush in // [os_name: str] <- args
+    "nt" == if
+        "cls" __system__
+    else
+        "clear" __system__
+    end
+end
+
+proc mkdir in // [dir: str] <- args
+    "mkdir " join __system__
+end
+
+proc create_file in // [filename: str] <- args
+    "type nul > " join __system__
+end
+
+proc open_file in // [filename: str] <- args
+    "cat " join __system__
+end
