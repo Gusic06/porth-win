@@ -197,7 +197,7 @@ class Scanner:
                 self.create_token("OP_PUSH", 1, "int", (self.line, self.line_index))
 
             case "false":
-                self.create_token("OP_DROP", 0, "int", (self.line, self.line_index))
+                self.create_token("OP_PUSH", 0, "int", (self.line, self.line_index))
 
             case "dup":
                 self.create_token("OP_DUP", None, "identifier", (self.line, self.line_index))
