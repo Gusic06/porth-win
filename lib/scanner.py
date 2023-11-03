@@ -1,9 +1,10 @@
 from os import system
-from os.path import exists
+from os.path import exists, abspath
 
 class Scanner:
 
     def __init__(self, source: str, filename: str) -> None:
+        self.path = __file__.split("\lib\scanner.py")
         self.source = source
         self.filename = filename
         self.orginal_filename = filename
@@ -251,11 +252,14 @@ class Scanner:
                     exit(1)
 
                 if self.return_value[-6:] == ".porth":
-                    if not exists(f"{self.return_value[:-6]}.iporth"):
+                    if self.return_value in ["std.porth", "system.porth"]:
+                        with open(f"{self.path[0]}\\std\\{self.return_value[:-6]}.iporth", "r") as file:
+                            self.included_contents.extend(list(eval(file.read())))
+                    elif not exists(f"{self.return_value[:-6]}.iporth"):
                         system(f"porth {self.return_value} -pci")
-                self.return_value = f"{self.return_value[:-6]}.iporth"
-                with open(self.return_value, "r") as file:
-                    self.included_contents.extend(list(eval(file.read())))
+                        self.return_value = f"{self.return_value[:-6]}.iporth"
+                        with open(self.return_value, "r") as file:
+                            self.included_contents.extend(list(eval(file.read())))
                 self.include = False
             else:
                 self.create_token("OP_PUSH", self.return_value, "string", (self.line, self.line_index))
@@ -290,39 +294,41 @@ class Scanner:
         self.index = 0
         self.go_to_end = False
         self.completed_proc = False
+        self.in_proc = False
         while len(self.included_contents) >= self.index + 1: # second pass for creating proc, probably gonna make the interpreter slower but oh well
             instruction = self.included_contents[self.index]
             if self.go_to_end:
-                self.proc_contents.append(instruction)
                 if instruction["type"] != "END_STATEMENT":
                     if instruction["type"] == "IF_STATEMENT":
                         self.end_tolerance += 1
-
                 else:
                     if self.end_tolerance == 0:
                         self.go_to_end = False
                         self.completed_proc = True
+                        continue
                     else:
                         self.end_tolerance -= 1
-                    continue
+                self.proc_contents.append(instruction)
 
-            if instruction["type"] == "PROC_STATEMENT":
+            elif instruction["type"] == "PROC_STATEMENT":
                 self.end_tolerance: int = 0
+                self.in_proc = True
                 self.proc_name: str = self.included_contents[self.index + 1]["value"]
                 self.proc_contents: list[dict] = []
 
                 if self.included_contents[self.index + 2]["type"] == "IN_STATEMENT":
-                    self.index += 3
+                    self.index += 2
                     self.go_to_end: bool = True
         
-            if self.completed_proc:
+            elif self.completed_proc:
                 self.proc = {"type" : "PROC", "value" : {"name" : self.proc_name, "contents" : self.proc_contents}, "struct" : "identifier", "pos" : instruction["pos"], "file" : self.filename}
                 self.output.append(self.proc)
                 self.completed_proc = False
+                self.in_proc = False
+
             else:
                 self.output.append(instruction)
             
             self.index += 1
-
 
         return self.output
