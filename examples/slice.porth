@@ -1,0 +1,4 @@
+"Hello, World!" "[::-1]" slice println // !dlroW ,olleH
+"Hello, World!" "[-6:]" slice println // World!
+
+"Hello, World!" dup "[-7:]" slice swap "[:5]" slice print println // Hello World!

@@ -1,0 +1,13 @@
+ // Terminal in Porth
+__main__ if
+    " > " print __input__ user_input =
+    user_input "exit" == if
+        0 exit
+    else
+        user_input __system__
+        "porth " __file__ swap join __system__ // infinite loop
+    end
+else // for handling include statements -> include "terminal.porth"
+    "To use this program, run 'porth terminal.porth' or 'py porth.py terminal.porth'" println
+    1 exit
+end

@@ -1,0 +1,4 @@
+__main__ if
+    " > " print __input__ println
+    "porth " __file__ swap join __system__
+end
