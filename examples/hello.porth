@@ -1,1 +1,7 @@
-"Hello, World!" println
+proc hello in
+    "Hello, World!" println
+end
+
+__main__ if
+    hello
+end
