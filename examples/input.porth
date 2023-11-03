@@ -1,4 +1,6 @@
+include "std.porth"
+
 __main__ if
-    " > " print __input__ println
+    " > " input println
     "porth " __file__ swap join __system__
 end
