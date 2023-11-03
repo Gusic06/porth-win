@@ -33,6 +33,8 @@ class Interpreter:
                 instruction: dict = instructions[index]
                 #print(self.variables)
 
+
+
                 if self.go_to_end is True: # for a situation where nested end statements exist (such as nested if conditions)
 
                     if instruction["type"] == "ELSE_STATEMENT" and self.end_tolerance == 0:
@@ -53,16 +55,13 @@ class Interpreter:
                 
                 if instruction["type"] == "PROC":
                     self.procs.append(instruction)
-                    print(self.procs)
 
                 if instruction["type"] == "INPUT_STATEMENT":
                     self.stack.append(input())
 
-                if instruction["type"] == "FOR_STATEMENT":
+                if instruction["type"] == "WHILE_STATEMENT":
                     self.jump = self.index + 1
-                    self.item1 = self.stack.pop()
-                    self.item2 = self.stack.pop()
-                    self.repeat = self.item1 - self.item2
+                    #self.while_loop = True
                     #print(self.repeat)
 
                 if instruction["type"] == "IF_STATEMENT":
@@ -78,7 +77,9 @@ class Interpreter:
                     self.go_to_end = True
                 
                 if instruction["type"] == "END_STATEMENT":
-                    self.go_to_end = False
+                    #if self.while_loop == True:
+                    #    if instructions[self.jump]:
+                    ...
                     #if self.repeat != 0:
                     #    print("guh")
 
@@ -140,18 +141,21 @@ class Interpreter:
 
                     if instruction["struct"] == "identifier":
                         
-                        #print(self.procs)
+                        
+                        self.is_proc = False
                         for proc in self.procs:
-                            #print(proc["value"]["name"])
+                            self.is_proc = False
                             if proc["value"]["name"] == instruction["value"]:
                                 self.interpret(proc["value"]["contents"], show_stack, silence)
-                                break
+                                self.is_proc = True
+                                continue
 
                         for variable in self.variables:
                             if variable["name"] == instruction["value"]:
                                 self.stack.append(variable["contents"])
                                 break
-                        else:
+
+                        if not self.is_proc:
                             self.stack.append(instruction["value"])
 
                     elif instruction["struct"] != "identifier":
@@ -208,7 +212,7 @@ class Interpreter:
 
                 if instruction["type"] == "OP_GT":
                     if instructions[index - 2]["struct"] == "string" or instructions[index - 1]["struct"] == "string":
-                        print(f"{instruction['file']}:{instruction['pos'][0]}:{instruction['pos'][1]}: Cannot use '>' operand on string type")
+                        print(f"\n{instruction['file']}:{instruction['pos'][0]}:{instruction['pos'][1]}: Cannot use '>' operand on string type")
                         exit(1)
                     self.item1 = self.stack.pop()
                     self.item2 = self.stack.pop()
@@ -216,7 +220,7 @@ class Interpreter:
 
                 if instruction["type"] == "OP_LT":
                     if instructions[index - 2]["struct"] == "string" or instructions[index - 1]["struct"] == "string":
-                        print(f"{instruction['file']}:{instruction['pos'][0]}:{instruction['pos'][1]}: Cannot use '<' operand on string type")
+                        print(f"\n{instruction['file']}:{instruction['pos'][0]}:{instruction['pos'][1]}: Cannot use '<' operand on string type")
                         exit(1)
                     self.item1 = self.stack.pop()
                     self.item2 = self.stack.pop()
@@ -224,7 +228,7 @@ class Interpreter:
 
                 if instruction["type"] == "OP_LTEQUALITY":
                     if instructions[index - 2]["struct"] == "string" or instructions[index - 1]["struct"] == "string":
-                        print(f"{instruction['file']}:{instruction['pos'][0]}:{instruction['pos'][1]}: Cannot use '<=' operand on string type")
+                        print(f"\n{instruction['file']}:{instruction['pos'][0]}:{instruction['pos'][1]}: Cannot use '<=' operand on string type")
                         exit(1)
                     self.item1 = self.stack.pop()
                     self.item2 = self.stack.pop()
@@ -232,7 +236,7 @@ class Interpreter:
 
                 if instruction["type"] == "OP_GTEQUALITY":
                     if instructions[index - 2]["struct"] == "string" or instructions[index - 1]["struct"] == "string":
-                        print(f"{instruction['file']}:{instruction['pos'][0]}:{instruction['pos'][1]}: Cannot use '>=' operand on string type")
+                        print(f"\n{instruction['file']}:{instruction['pos'][0]}:{instruction['pos'][1]}: Cannot use '>=' operand on string type")
                         exit(1)
                     self.item1 = self.stack.pop()
                     self.item2 = self.stack.pop()
@@ -240,7 +244,7 @@ class Interpreter:
 
                 if instruction["type"] == "OP_PLUS":
                     if instructions[index - 2]["struct"] == "string" or instructions[index - 1]["struct"] == "string":
-                        print(f"{instruction['file']}:{instruction['pos'][0]}:{instruction['pos'][1]}: Cannot use '+' operand on string type")
+                        print(f"\n{instruction['file']}:{instruction['pos'][0]}:{instruction['pos'][1]}: Cannot use '+' operand on string type")
                         exit(1)
                     self.item1 = self.stack.pop()
                     self.item2 = self.stack.pop()
@@ -248,7 +252,7 @@ class Interpreter:
 
                 if instruction["type"] == "OP_MINUS":
                     if instructions[index - 2]["struct"] == "string" or instructions[index - 1]["struct"] == "string":
-                        print(f"{instruction['file']}:{instruction['pos'][0]}:{instruction['pos'][1]}: Cannot use '-' operand on string type")
+                        print(f"\n{instruction['file']}:{instruction['pos'][0]}:{instruction['pos'][1]}: Cannot use '-' operand on string type")
                         exit(1)
                     self.item1 = self.stack.pop()
                     self.item2 = self.stack.pop()
@@ -276,9 +280,10 @@ class Interpreter:
                 s: str = "s" if len(self.stack) > 1 or self.stack == 0 else ""
                 were: str = "were" if len(self.stack) > 1 or self.stack == 0 else "was"
 
-                print(f"{self.filename}: [ {len(self.stack)} ] item{s} {were} left unused on the stack.")
+
+                #print(f"\n{self.filename}: [ {len(self.stack)} ] item{s} {were} left unused on the stack.")
 
         except Exception as Error:
             print("guh")
-            print(f"{instruction['file']}:{instruction['pos'][0]}:{instruction['pos'][1]}: {Error=}")
+            print(f"\n{instruction['file']}:{instruction['pos'][0]}:{instruction['pos'][1]}: {Error=}")
             exit(1)
