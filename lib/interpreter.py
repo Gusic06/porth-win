@@ -34,6 +34,7 @@ class Interpreter:
             for index in range(len(instructions)):
                 #print(index)
                 instruction: dict = instructions[self.index]
+                self.index += 1
 
                 if self.go_to_end is True: # for a situation where nested end statements exist (such as nested if conditions)
 
@@ -300,8 +301,6 @@ class Interpreter:
 
                 if show_stack:
                     print(f"{index}{' ' * (4 - len(str(index)))}: {self.stack}")
-
-                self.index += 1
 
             if len(self.stack) != 0:
                 s: str = "s" if len(self.stack) > 1 or self.stack == 0 else ""
